@@ -2,6 +2,7 @@ package osx
 
 import (
 	"net/http"
+	"fmt"
 
 	"github.com/bmizerany/pat"
 
@@ -10,16 +11,23 @@ import (
 
 
 type OSXInformant struct{
-	generic.GenericInformation
 	generic.GenericInformant
 }
 
 
 func New(pat *pat.PatternServeMux) (*OSXInformant){
-	informant := new(OSXInformant)
+	informant     := new(OSXInformant)
 	informant.Pat = pat
 	return informant
 }
 
+func (informant *OSXInformant) RegisterRoutes(){
+	informant.Pat.Get("/sysctl/machdep/cpu/core_count", http.HandlerFunc(informant.sysctlMachdepCpuCoreCount))
 
-func (OSXInformant) OsName (w http.ResponseWriter, req *http.Request){}
+}
+
+// sysctlMachdepCpuCoreCount returns result of:
+// $> sysctl -n machdep.cpu.core_count
+func (informant *OSXInformant) sysctlMachdepCpuCoreCount(w http.ResponseWriter, req *http.Request) {
+	fmt.Println("Something coole")
+}

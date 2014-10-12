@@ -12,14 +12,12 @@ import(
 
 // GenericInformation implements functions that return OS-agnostic stats
 type GenericInformation interface {
+	RegisterRoutes()
 	// OsName returns the value of runtime.GOOS
-	OsName(w http.ResponseWriter, req *http.Request)
+	//OsName(w http.ResponseWriter, req *http.Request)
 	// OsArch returns the value of runtime.GOARCH
 	//OsArch()
-	// CoreCount returns the number of cores on the machine
-	//CoreCount()
-	// ThreadCount returns the number of threads that can be run in parallel on the hardware
-	//ThreadCount()
+
 }
 
 // GenericInformant provides a minimal interface for dealing w/ the wire
@@ -27,8 +25,18 @@ type GenericInformant struct {
 	Pat *pat.PatternServeMux
 }
 
+func New(pat *pat.PatternServeMux) (*GenericInformant){
+	informant     := new(GenericInformant)
+	informant.Pat = pat
+	return informant
+}
 
 // OsName returns the value of runtime.GOOS
-func (GenericInformant) OsName(w http.ResponseWriter, req *http.Request){
+func (informant *GenericInformant) OsName(w http.ResponseWriter, req *http.Request){
 	io.WriteString(w, "" + runtime.GOOS + "\n")
 }
+
+func (informant *GenericInformant) RegisterRoutes(){
+	informant.Pat.Get("/generic/os_name", http.HandlerFunc(informant.OsName))
+}
+

@@ -15,14 +15,15 @@ import (
 func main() {
 	m := pat.New()
 
-	var informant *generic.GenericInformant
+	genericInformant := generic.New(m)
+	genericInformant.RegisterRoutes()
+
 	switch runtime.GOOS {
 	case "darwin":
-		informant = osx.New(m)
+		osxInformant := osx.New(m)
+		osxInformant.RegisterRoutes()
 	}
 
-
-	loadMuxedRoutes(informant)
 	http.Handle("/", m)
 	err := http.ListenAndServe(":12345", nil)
 	if err != nil {
@@ -30,8 +31,6 @@ func main() {
 	}
 }
 
-func loadMuxedRoutes(informant *generic.GenericInformant){
-	informant.Pat.Get("/generic/os_name", http.HandlerFunc(informant.OsName))
-}
+
 
 
