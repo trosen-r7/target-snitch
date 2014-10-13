@@ -1,7 +1,7 @@
 package main
 
 import (
-  "log"
+	"log"
 	"github.com/bmizerany/pat"
 	"net/http"
 	"runtime"
@@ -15,6 +15,8 @@ import (
 func main() {
 	m := pat.New()
 
+	// Generic is always registered, as the routes in there
+	// only provide things from the Go runtime package.
 	genericInformant := generic.New(m)
 	genericInformant.RegisterRoutes()
 

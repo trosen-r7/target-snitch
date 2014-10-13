@@ -33,7 +33,7 @@ func (informant *OSXInformant) RegisterRoutes(){
 // sysctlMachdepCpuCoreCount returns result of:
 // $> sysctl -n machdep.cpu.core_count
 func (informant *OSXInformant) sysctlMachdepCpuCoreCount(w http.ResponseWriter, req *http.Request) {
-	cmd				:= exec.Command("sysctl", "-n", "machdep.cpu.core_count")
+	cmd	:= exec.Command("sysctl", "-n", "machdep.cpu.core_count")
 
 	cmdResult := generic.RunCommand(cmd)
 	io.WriteString(w, string(generic.JsonMarshalSingleValue(cmdResult)))

@@ -7,4 +7,4 @@ provide information from:
 
   * /proc/* (Linux)
   * sysctl (OSX)
-  * Win32 as appropriate
+  * tasklist.exe, WMI, etc (Windows)
