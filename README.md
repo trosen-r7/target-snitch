@@ -2,8 +2,8 @@
 
 (work-in-progress)
 
-A lab system needs to be visible from the outside. TargetSnitch will
-provide information from:
+A lab system needs to be visible from the outside. TargetSnitch
+provides information from the following sources and makes it available as JSON served over HTTP:
 
   * /proc/* (Linux)
   * sysctl (OSX)
