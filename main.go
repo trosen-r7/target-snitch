@@ -1,6 +1,7 @@
 package main
 
 import (
+  "fmt"
 	"log"
 	"github.com/bmizerany/pat"
 	"net/http"
@@ -26,11 +27,14 @@ func main() {
 		osxInformant.RegisterRoutes()
 	}
 
+  fmt.Println("[+] TargetSnitch is listening on port 12345")
+
 	http.Handle("/", m)
 	err := http.ListenAndServe(":12345", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
+
 }
 
 
