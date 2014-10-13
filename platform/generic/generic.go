@@ -50,6 +50,12 @@ func New(pat *pat.PatternServeMux) (*GenericInformant){
 	return informant
 }
 
+// OsArch returns the value of runtime.GOARCH
+func (informant *GenericInformant) OsArch(w http.ResponseWriter, req *http.Request){
+	response := JsonMarshalSingleValue(runtime.GOARCH)
+	io.WriteString(w, string(response))
+}
+
 // OsName returns the value of runtime.GOOS
 func (informant *GenericInformant) OsName(w http.ResponseWriter, req *http.Request){
 	response := JsonMarshalSingleValue(runtime.GOOS)
@@ -60,6 +66,8 @@ func (informant *GenericInformant) OsName(w http.ResponseWriter, req *http.Reque
 // for all information handed back by the Informant.
 func (informant *GenericInformant) RegisterRoutes(){
 	informant.Pat.Get("/", http.HandlerFunc(informant.Root))
+
+	informant.Pat.Get("/generic/os_arch", http.HandlerFunc(informant.OsArch))
 	informant.Pat.Get("/generic/os_name", http.HandlerFunc(informant.OsName))
 }
 
@@ -79,14 +87,16 @@ func (informant *GenericInformant) Root(w http.ResponseWriter, req *http.Request
 	io.WriteString(w, responseString)
 }
 
+// JsonMarshallSingleValue takes either a bytes.Buffer or a string type
+// and places it into a JSON-encoded string at the key "value".
 func JsonMarshalSingleValue(cmdResult interface{}) []byte {
 	response := NewJsonResponse()
 
 	switch t := cmdResult.(type){
 	case bytes.Buffer:
-		response.Result["value"] = strings.TrimSpace(cmdResult.String())
+		response.Result["value"] = strings.TrimSpace(t.String())
 	case string:
-		response.Result["value"] = strings.TrimSpace(cmdResult)
+		response.Result["value"] = strings.TrimSpace(t)
 	}
 
 	jsonBytes, err := json.Marshal(response.Result)
@@ -96,6 +106,8 @@ func JsonMarshalSingleValue(cmdResult interface{}) []byte {
 	return jsonBytes
 }
 
+// RunCommand uses the os/exec package to run a shell
+// command on the system.
 func RunCommand(cmd *exec.Cmd) (bytes.Buffer){
 	var out bytes.Buffer
 	cmd.Stdout = &out
