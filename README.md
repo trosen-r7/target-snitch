@@ -24,7 +24,8 @@ TargetSnitch must:
 * Install Go if you don't have it already, including setting up a
   $GOPATH variable.
 
-* Clone this repo
+* Clone this repo into $GOPATH/src/github.com/trevrosen/target-snitch
+  per Go standard practice.
 
 * Go into the dir and `go run main.go`
 
