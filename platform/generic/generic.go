@@ -52,7 +52,8 @@ func New(pat *pat.PatternServeMux) (*GenericInformant){
 
 // OsName returns the value of runtime.GOOS
 func (informant *GenericInformant) OsName(w http.ResponseWriter, req *http.Request){
-	io.WriteString(w, "" + runtime.GOOS + "\n")
+	response := JsonMarshalSingleValue(runtime.GOOS)
+	io.WriteString(w, string(response))
 }
 
 // RegisterRoutes registers URL route patterns and handler functions
@@ -78,9 +79,16 @@ func (informant *GenericInformant) Root(w http.ResponseWriter, req *http.Request
 	io.WriteString(w, responseString)
 }
 
-func JsonMarshalSingleValue(cmdResult bytes.Buffer) []byte {
+func JsonMarshalSingleValue(cmdResult interface{}) []byte {
 	response := NewJsonResponse()
-	response.Result["value"] = strings.TrimSpace(cmdResult.String())
+
+	switch t := cmdResult.(type){
+	case bytes.Buffer:
+		response.Result["value"] = strings.TrimSpace(cmdResult.String())
+	case string:
+		response.Result["value"] = strings.TrimSpace(cmdResult)
+	}
+
 	jsonBytes, err := json.Marshal(response.Result)
 	if err != nil {
 		log.Fatal(err)
