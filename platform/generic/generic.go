@@ -10,11 +10,15 @@ import(
 	"net/http"
 	"os/exec"
 	"runtime"
+	_"fmt"
 	"strings"
 
 	"github.com/bmizerany/pat"
 )
 
+
+// The fields in a 'ps -f' shell command
+var psfFields = [...]string {"UID", "PID", "PPID", "C", "STIME", "TTY", "TIME", "CMD", "ARGV"}
 
 
 // GenericInformation implements functions that return OS-agnostic stats
@@ -62,6 +66,36 @@ func (informant *GenericInformant) OsName(w http.ResponseWriter, req *http.Reque
 	io.WriteString(w, string(response))
 }
 
+// Ps returns the output of (ps -f), which contains
+// UID, PID, PPID, C, STIME, TTY, TIME, CMD and the ARGV for CMD
+func (informant *GenericInformant) Ps(w http.ResponseWriter, req *http.Request) {
+	cmd := exec.Command("ps", "-Af")
+
+	cmdResult     := RunCommand(cmd)
+	responseLines := bytes.Split(cmdResult.Bytes(), []byte("\n"))
+	responseArray := []map[string]string{}
+
+	for i, psLine := range responseLines {
+		if i == 0 { continue } // skip header line
+		var lineMap  = make(map[string]string)
+		for j, fieldBytes := range bytes.Fields(psLine) {
+			if j < len(psfFields){
+				lineMap[psfFields[j]] = string(fieldBytes)
+			}
+		}
+		if len(lineMap) > 0 {
+			responseArray = append(responseArray, lineMap)
+		}
+	}
+
+	responseJSON, error     := json.Marshal(responseArray)
+	if error != nil {
+		log.Fatalln(error)
+	}
+	io.WriteString(w, string(responseJSON))
+}
+
+
 // RegisterRoutes registers URL route patterns and handler functions
 // for all information handed back by the Informant.
 func (informant *GenericInformant) RegisterRoutes(){
@@ -69,6 +103,7 @@ func (informant *GenericInformant) RegisterRoutes(){
 
 	informant.Pat.Get("/generic/os_arch", http.HandlerFunc(informant.OsArch))
 	informant.Pat.Get("/generic/os_name", http.HandlerFunc(informant.OsName))
+	informant.Pat.Get("/generic/ps", http.HandlerFunc(informant.Ps))
 }
 
 func (informant *GenericInformant) Root(w http.ResponseWriter, req *http.Request){
@@ -118,3 +153,4 @@ func RunCommand(cmd *exec.Cmd) (bytes.Buffer){
 	}
 	return out
 }
+
