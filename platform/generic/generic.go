@@ -10,7 +10,7 @@ import(
 	"net/http"
 	"os/exec"
 	"runtime"
-	"fmt"
+	_"fmt"
 	"strings"
 
 	"github.com/bmizerany/pat"
@@ -69,7 +69,7 @@ func (informant *GenericInformant) OsName(w http.ResponseWriter, req *http.Reque
 // Ps returns the output of (ps -f), which contains
 // UID, PID, PPID, C, STIME, TTY, TIME, CMD and the ARGV for CMD
 func (informant *GenericInformant) Ps(w http.ResponseWriter, req *http.Request) {
-	cmd := exec.Command("ps", "-f")
+	cmd := exec.Command("ps", "-Af")
 
 	cmdResult     := RunCommand(cmd)
 	responseLines := bytes.Split(cmdResult.Bytes(), []byte("\n"))
@@ -83,12 +83,14 @@ func (informant *GenericInformant) Ps(w http.ResponseWriter, req *http.Request) 
 				lineMap[psfFields[j]] = string(fieldBytes)
 			}
 		}
-		responseArray = append(responseArray, lineMap)
+		if len(lineMap) > 0 {
+			responseArray = append(responseArray, lineMap)
+		}
 	}
 
 	responseJSON, error     := json.Marshal(responseArray)
 	if error != nil {
-		log.Fatalln(error)	
+		log.Fatalln(error)
 	}
 	io.WriteString(w, string(responseJSON))
 }
