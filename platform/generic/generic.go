@@ -73,28 +73,24 @@ func (informant *GenericInformant) Ps(w http.ResponseWriter, req *http.Request) 
 
 	cmdResult     := RunCommand(cmd)
 	responseLines := bytes.Split(cmdResult.Bytes(), []byte("\n"))
-	var responseArray = make([]map[string]string)
+	responseArray := []map[string]string{}
 
 	for i, psLine := range responseLines {
 		if i == 0 { continue } // skip header line
-		var lineMap map[string]string
+		var lineMap  = make(map[string]string)
 		for j, fieldBytes := range bytes.Fields(psLine) {
-			lineMap[psfFields[j]] = string(fieldBytes)
+			if j < len(psfFields){
+				lineMap[psfFields[j]] = string(fieldBytes)
+			}
 		}
-		append(responseLines, lineMap)
+		responseArray = append(responseArray, lineMap)
 	}
 
-	fmt.Println(responseLines)
-
-	// split on \n
-	// remove first line
-	// split on spaces and remove empties
-	// parse remaining array into array of maps
-
-
-
-	//response     := JsonMarshalMap(cmdResult)
-	io.WriteString(w, "TESTING: check console")
+	responseJSON, error     := json.Marshal(responseArray)
+	if error != nil {
+		log.Fatalln(error)	
+	}
+	io.WriteString(w, string(responseJSON))
 }
 
 
@@ -123,11 +119,6 @@ func (informant *GenericInformant) Root(w http.ResponseWriter, req *http.Request
 	`
 	io.WriteString(w, responseString)
 }
-
-// JsonMarshalStringMap will take any map of string keys and values and turn it into JSON
-//func JsonMarshalStringMap(map[string]string) []byte {
-//}
-
 
 // JsonMarshallSingleValue takes either a bytes.Buffer or a string type
 // and places it into a JSON-encoded string at the key "value".
