@@ -10,11 +10,15 @@ import(
 	"net/http"
 	"os/exec"
 	"runtime"
+	"fmt"
 	"strings"
 
 	"github.com/bmizerany/pat"
 )
 
+
+// The fields in a 'ps -f' shell command
+var psfFields = [...]string {"UID", "PID", "PPID", "C", "STIME", "TTY", "TIME", "CMD", "ARGV"}
 
 
 // GenericInformation implements functions that return OS-agnostic stats
@@ -62,6 +66,38 @@ func (informant *GenericInformant) OsName(w http.ResponseWriter, req *http.Reque
 	io.WriteString(w, string(response))
 }
 
+// Ps returns the output of (ps -f), which contains
+// UID, PID, PPID, C, STIME, TTY, TIME, CMD and the ARGV for CMD
+func (informant *GenericInformant) Ps(w http.ResponseWriter, req *http.Request) {
+	cmd := exec.Command("ps", "-f")
+
+	cmdResult     := RunCommand(cmd)
+	responseLines := bytes.Split(cmdResult.Bytes(), []byte("\n"))
+	var responseArray = make([]map[string]string)
+
+	for i, psLine := range responseLines {
+		if i == 0 { continue } // skip header line
+		var lineMap map[string]string
+		for j, fieldBytes := range bytes.Fields(psLine) {
+			lineMap[psfFields[j]] = string(fieldBytes)
+		}
+		append(responseLines, lineMap)
+	}
+
+	fmt.Println(responseLines)
+
+	// split on \n
+	// remove first line
+	// split on spaces and remove empties
+	// parse remaining array into array of maps
+
+
+
+	//response     := JsonMarshalMap(cmdResult)
+	io.WriteString(w, "TESTING: check console")
+}
+
+
 // RegisterRoutes registers URL route patterns and handler functions
 // for all information handed back by the Informant.
 func (informant *GenericInformant) RegisterRoutes(){
@@ -69,6 +105,7 @@ func (informant *GenericInformant) RegisterRoutes(){
 
 	informant.Pat.Get("/generic/os_arch", http.HandlerFunc(informant.OsArch))
 	informant.Pat.Get("/generic/os_name", http.HandlerFunc(informant.OsName))
+	informant.Pat.Get("/generic/ps", http.HandlerFunc(informant.Ps))
 }
 
 func (informant *GenericInformant) Root(w http.ResponseWriter, req *http.Request){
@@ -86,6 +123,11 @@ func (informant *GenericInformant) Root(w http.ResponseWriter, req *http.Request
 	`
 	io.WriteString(w, responseString)
 }
+
+// JsonMarshalStringMap will take any map of string keys and values and turn it into JSON
+//func JsonMarshalStringMap(map[string]string) []byte {
+//}
+
 
 // JsonMarshallSingleValue takes either a bytes.Buffer or a string type
 // and places it into a JSON-encoded string at the key "value".
@@ -118,3 +160,4 @@ func RunCommand(cmd *exec.Cmd) (bytes.Buffer){
 	}
 	return out
 }
+
