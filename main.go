@@ -9,6 +9,7 @@ import (
 
 	"github.com/trevrosen/target-snitch/platform/generic"
 	"github.com/trevrosen/target-snitch/platform/osx"
+	"github.com/trevrosen/target-snitch/platform/linux"
 )
 
 
@@ -21,6 +22,7 @@ func main() {
 	genericInformant := generic.New(m)
 	genericInformant.RegisterRoutes()
 
+	// Load OS-specific routes
 	switch runtime.GOOS {
 	case "darwin":
 		osxInformant := osx.New(m)
