@@ -1,4 +1,4 @@
-package main
+package oslinux
 
 import(
 	"testing"
@@ -24,3 +24,10 @@ VmPeak:	   61384 kB
 VmSize:	   61364 kB
 `,
 	out: "something"}
+
+
+func TestColonProcess(t *testing.T) {
+
+
+}
+

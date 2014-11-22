@@ -9,7 +9,7 @@ import (
 
 	"github.com/trevrosen/target-snitch/platform/generic"
 	"github.com/trevrosen/target-snitch/platform/osx"
-	"github.com/trevrosen/target-snitch/platform/linux"
+	"github.com/trevrosen/target-snitch/platform/oslinux"
 )
 
 
@@ -27,6 +27,9 @@ func main() {
 	case "darwin":
 		osxInformant := osx.New(m)
 		osxInformant.RegisterRoutes()
+	case "linux":
+		linuxInformant := oslinux.New(m)
+		linuxInformant.RegisterRoutes()
 	}
 
   fmt.Println("[+] TargetSnitch is listening on port 12345")
