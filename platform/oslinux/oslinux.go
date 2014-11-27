@@ -4,6 +4,7 @@ import(
 	"net/http"
 	"io"
 	"bytes"
+	_"fmt"
 
 	"github.com/bmizerany/pat"
 	"github.com/trevrosen/target-snitch/platform/generic"
@@ -31,21 +32,21 @@ func (informant *LinuxInformant) RegisterRoutes(){
 	informant.Pat.Get("/proc/cpuinfo", http.HandlerFunc(informant.procCpuInfo))
 }
 
-func SomeString() string{
-	return "This is a thing"
-}
 
-func ParsedPairs(cmdOriginalOutput []byte, separator string) (outputMap map[string] string, err error) {
+func ParsedPairs(cmdOriginalOutput []byte, separator string) (outputArray []map[string] string, err error) {
 	parsedLines := bytes.Split(cmdOriginalOutput, []byte("\n"))
 
 	for _, line := range parsedLines{
+		if len(line) == 0 { continue }
 		pair := bytes.Split(line, []byte(separator))
-		if len(pair) > 2 {
+		if len(pair) != 2 {
 			// return error and empty map
 		}
-		outputMap[string(pair[0])] = string(pair[1])
+		pairMap := make(map[string]string)
+		pairMap[string(pair[0])] = string(bytes.TrimSpace(pair[1]))
+		outputArray = append(outputArray, pairMap)
 	}
 
-	return outputMap, err
+	return outputArray, err
 }
 

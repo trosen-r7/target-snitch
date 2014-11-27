@@ -6,9 +6,11 @@ import(
 	"github.com/stretchr/testify/assert"
 )
 
-var procfsParse = []struct {
+// Test for key-value data separated by colons,
+// similar to the output of `cat /proc/<PID>/status`
+var procfsStatus = []struct {
 	in string
-	out map[string] string
+	out []map[string] string
 }{
 	{
 	in:`
@@ -16,23 +18,19 @@ Name:	sshd
 State:	S (sleeping)
 Tgid:	860
 `,
-	out: map[string]string{
-		"Name":"sshd",
-		"State":"S (sleeping)",
-		"Tgid":"860",
+	out: []map[string] string{
+			{ "Name":"sshd" },
+			{ "State":"S (sleeping)" },
+			{ "Tgid":"860" },
 		},
 	},
 }
 
 
-func TestSomeString(t *testing.T) {
-	actual := SomeString()
-	assert.Equal(t, "This is a thing", actual)
-}
-
-
-func TestParsedPairs(t *testing.T) {
-	for _, test := range procfsParse{
+// Test that ParsedPairs can parse data similar to what comes from
+// `cat /proc/<PID>/status`
+func TestParsedPairsWithColon(t *testing.T) {
+	for _, test := range procfsStatus{
 		actual, _ := ParsedPairs([]byte(test.in), ":")
 		assert.Equal(t, test.out, actual)
 	}
