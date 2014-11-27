@@ -2,32 +2,39 @@ package oslinux
 
 import(
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var procfsParse = []struct {
 	in string
-	out string
+	out map[string] string
 }{
+	{
 	in:`
 Name:	sshd
 State:	S (sleeping)
 Tgid:	860
-Ngid:	0
-Pid:	860
-PPid:	1
-TracerPid:	0
-Uid:	0	0	0	0
-Gid:	0	0	0	0
-FDSize:	64
-Groups:
-VmPeak:	   61384 kB
-VmSize:	   61364 kB
 `,
-	out: "something"}
-
-
-func TestColonProcess(t *testing.T) {
-
-
+	out: map[string]string{
+		"Name":"sshd",
+		"State":"S (sleeping)",
+		"Tgid":"860",
+		},
+	},
 }
+
+
+func TestTheStuff(t *testing.T) {
+	actual := SomeString()
+	assert.Equal(t, "This is a thing", actual)
+}
+
+
+//func TestColonProcess(t *testing.T) {
+	//for i, test := range procfsParse{
+		//actual, _ := ParsedPairs([]byte(test.in), ":")
+		//assert.Equal(t, test.out, actual)
+	//}
+//}
 
