@@ -25,16 +25,16 @@ Tgid:	860
 }
 
 
-func TestTheStuff(t *testing.T) {
+func TestSomeString(t *testing.T) {
 	actual := SomeString()
 	assert.Equal(t, "This is a thing", actual)
 }
 
 
-//func TestColonProcess(t *testing.T) {
-	//for i, test := range procfsParse{
-		//actual, _ := ParsedPairs([]byte(test.in), ":")
-		//assert.Equal(t, test.out, actual)
-	//}
-//}
+func TestParsedPairs(t *testing.T) {
+	for _, test := range procfsParse{
+		actual, _ := ParsedPairs([]byte(test.in), ":")
+		assert.Equal(t, test.out, actual)
+	}
+}
 
