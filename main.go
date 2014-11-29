@@ -9,6 +9,7 @@ import (
 
 	"github.com/trevrosen/target-snitch/platform/generic"
 	"github.com/trevrosen/target-snitch/platform/osx"
+	"github.com/trevrosen/target-snitch/platform/oslinux"
 )
 
 
@@ -21,10 +22,14 @@ func main() {
 	genericInformant := generic.New(m)
 	genericInformant.RegisterRoutes()
 
+	// Load OS-specific routes
 	switch runtime.GOOS {
 	case "darwin":
 		osxInformant := osx.New(m)
 		osxInformant.RegisterRoutes()
+	case "linux":
+		linuxInformant := oslinux.New(m)
+		linuxInformant.RegisterRoutes()
 	}
 
   fmt.Println("[+] TargetSnitch is listening on port 12345")

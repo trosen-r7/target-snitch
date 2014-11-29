@@ -43,6 +43,8 @@ type JsonResponse struct {
 }
 
 // NewJsonResponse initializes a JsonResponse
+// Use this when you need to manually set up a bunch of arbitrary JSON
+// in a function and need a return value.
 func NewJsonResponse() *JsonResponse {
 	return &JsonResponse{Result: make(map[string]interface{})}
 }
@@ -66,8 +68,10 @@ func (informant *GenericInformant) OsName(w http.ResponseWriter, req *http.Reque
 	io.WriteString(w, string(response))
 }
 
-// Ps returns the output of (ps -f), which contains
-// UID, PID, PPID, C, STIME, TTY, TIME, CMD and the ARGV for CMD
+// Ps returns the output of (ps -Af), returning JSON with keys
+// UID, PID, PPID, C, STIME, TTY, TIME, CMD and ARGV
+// all but ARGV are listed as the headers when running `ps -f`. ARGV is custom
+// to target-snitch in order to represent the ARGV passed to the CMD.
 func (informant *GenericInformant) Ps(w http.ResponseWriter, req *http.Request) {
 	cmd := exec.Command("ps", "-Af")
 
@@ -88,11 +92,11 @@ func (informant *GenericInformant) Ps(w http.ResponseWriter, req *http.Request) 
 		}
 	}
 
-	responseJSON, error     := json.Marshal(responseArray)
+	responseJson, error     := json.Marshal(responseArray)
 	if error != nil {
 		log.Fatalln(error)
 	}
-	io.WriteString(w, string(responseJSON))
+	io.WriteString(w, string(responseJson))
 }
 
 
