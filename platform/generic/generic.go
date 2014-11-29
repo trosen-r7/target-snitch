@@ -92,11 +92,11 @@ func (informant *GenericInformant) Ps(w http.ResponseWriter, req *http.Request) 
 		}
 	}
 
-	responseJSON, error     := json.Marshal(responseArray)
+	responseJson, error     := json.Marshal(responseArray)
 	if error != nil {
 		log.Fatalln(error)
 	}
-	io.WriteString(w, string(responseJSON))
+	io.WriteString(w, string(responseJson))
 }
 
 
