@@ -19,23 +19,36 @@ TargetSnitch must:
 
 ## Quick Start
 
-(on OSX)
+### Building for platforms:
 
-* Install Go if you don't have it already, including setting up a
-  $GOPATH variable.
+**Note: you need cross compilation support in your local Go install**
 
-* Clone this repo into $GOPATH/src/github.com/trevrosen/target-snitch
-  per Go standard practice.
+For Linux (64-bit) targets:
 
-* Go into the dir and `go run main.go`
+`GOARCH=amd64 GOOS=linux go build`
 
-* That window will be bound w/ no output
+For Linux (ARM7) targets:
 
-* Point your browswer to http://localhost:12345
+`GOARCH=arm GOARM=7 GOOS=linux go build`
 
-* Physical core count: http://localhost:12345/sysctl/machdep/cpu/core_count
+For OSX (64-bit) targets:
 
-* OS family name: http://localhost:12345/generic/os_name
+`GOARCH=amd64 GOOS=darwin go build`
 
-* OS arch name: http://localhost:12345/generic/os_arch
 
+## Informants
+Each supported operating system/platform is genericized into "Informant" types which declare URL routes and their handler functions. Each of these relative URLs will return JSON-ified responses from running the commands on the target host.
+
+#### Generic
+* Process listing: `/generic/ps` => `ps -Af`
+* Target OS Name: `/generic/os_name`
+* Target OS Arch: `/generic/os_arch`
+
+
+#### Linux
+* `/etc/issue` => `cat /etc/issue`
+* `/proc/cpuinfo` => `cat /proc/cpuinfo`
+* `/proc/:pid/status` => `cat /proc/:pid/status`
+
+#### OS X
+* `/sysctl/machdep/cpu/core_count` => `sysctl -n machdep.cpu.core_count`
