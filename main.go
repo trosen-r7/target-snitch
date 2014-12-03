@@ -1,18 +1,24 @@
 package main
 
 import (
-  "fmt"
-	"log"
+	"flag"
+	"fmt"
 	"github.com/bmizerany/pat"
+	"log"
 	"net/http"
 	"runtime"
 
 	"github.com/trevrosen/target-snitch/platform/generic"
-	"github.com/trevrosen/target-snitch/platform/osx"
 	"github.com/trevrosen/target-snitch/platform/oslinux"
+	"github.com/trevrosen/target-snitch/platform/osx"
 )
 
+var listenerPort string
 
+func init() {
+	flag.StringVar(&listenerPort, "port", "12345", "port that TargetSnitch listens on")
+	flag.Parse()
+}
 
 func main() {
 	m := pat.New()
@@ -32,16 +38,13 @@ func main() {
 		linuxInformant.RegisterRoutes()
 	}
 
-  fmt.Println("[+] TargetSnitch is listening on port 12345")
+	fmt.Println("[+] TargetSnitch is listening on port", listenerPort)
+	portString := ":" + listenerPort
 
 	http.Handle("/", m)
-	err := http.ListenAndServe(":12345", nil)
+	err := http.ListenAndServe(portString, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 
 }
-
-
-
-
