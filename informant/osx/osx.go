@@ -1,31 +1,29 @@
 package osx
 
 import (
+	"io"
 	"net/http"
 	"os/exec"
-	"io"
 
 	"github.com/bmizerany/pat"
 
-	"github.com/trevrosen/target-snitch/platform/generic"
+	"github.com/trevrosen/target-snitch/informant/generic"
 )
 
-
-type OSXInformant struct{
+type OSXInformant struct {
 	generic.GenericInformant
 }
 
-
 // New creates a new OSXInformant
-func New(pat *pat.PatternServeMux) (*OSXInformant){
-	informant     := new(OSXInformant)
+func New(pat *pat.PatternServeMux) *OSXInformant {
+	informant := new(OSXInformant)
 	informant.Pat = pat
 	return informant
 }
 
 // RegisterRoutes registers URL route patterns and handler functions
 // for all information handed back by the Informant.
-func (informant *OSXInformant) RegisterRoutes(){
+func (informant *OSXInformant) RegisterRoutes() {
 	informant.Pat.Get("/sysctl/machdep/cpu/core_count", http.HandlerFunc(informant.sysctlMachdepCpuCoreCount))
 
 }
@@ -33,11 +31,8 @@ func (informant *OSXInformant) RegisterRoutes(){
 // sysctlMachdepCpuCoreCount returns result of:
 // $> sysctl -n machdep.cpu.core_count
 func (informant *OSXInformant) sysctlMachdepCpuCoreCount(w http.ResponseWriter, req *http.Request) {
-	cmd	:= exec.Command("sysctl", "-n", "machdep.cpu.core_count")
+	cmd := exec.Command("sysctl", "-n", "machdep.cpu.core_count")
 
 	cmdResult := generic.RunCommand(cmd)
 	io.WriteString(w, string(generic.JsonMarshalSingleValue(cmdResult)))
 }
-
-
-

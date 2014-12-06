@@ -1,4 +1,4 @@
-package oslinux
+package standard
 
 import (
 	"testing"

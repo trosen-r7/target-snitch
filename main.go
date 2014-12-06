@@ -8,9 +8,10 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/trevrosen/target-snitch/platform/generic"
-	"github.com/trevrosen/target-snitch/platform/oslinux"
-	"github.com/trevrosen/target-snitch/platform/osx"
+	"github.com/trevrosen/target-snitch/informant/generic"
+	_ "github.com/trevrosen/target-snitch/informant/linux/android"
+	"github.com/trevrosen/target-snitch/informant/linux/standard"
+	"github.com/trevrosen/target-snitch/informant/osx"
 )
 
 var listenerPort string
@@ -34,7 +35,7 @@ func main() {
 		osxInformant := osx.New(m)
 		osxInformant.RegisterRoutes()
 	case "linux":
-		linuxInformant := oslinux.New(m)
+		linuxInformant := standard.New(m)
 		linuxInformant.RegisterRoutes()
 	}
 

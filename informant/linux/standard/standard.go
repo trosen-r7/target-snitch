@@ -1,4 +1,4 @@
-package oslinux
+package standard
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 	"os/exec"
 
 	"github.com/bmizerany/pat"
-	"github.com/trevrosen/target-snitch/platform/generic"
+	"github.com/trevrosen/target-snitch/informant/generic"
 )
 
 type LinuxInformant struct {
